@@ -1,0 +1,15 @@
+collection = [[173346, '7 Wonders Duel', 326707, 'Dutch/English/Korean edition', ['Dutch', 'English', 'Korean'], 2016, 12.126, 12.126, 2.04724, 1.54324], [180263, 'The 7th Continent', 278264, 'English first edition', ['English'], 2017, 8.85827, 12.4016, 4.25197, 7.27525], [205637, 'Arkham Horror: The Card Game', 320688, 'English edition', ['English'], 2016, 10.0, 10.0, 2.0, 2.0503], [37111, 'Battlestar Galactica: The Board Game', 24172, 'English first edition', ['English'], 2008, 11.7, 11.7, 2.8, 3.06], [84876, 'The Castles of Burgundy', 141049, 'Ravensburger English/French edition', ['English', 'French'], 2011, 8.625, 12.2, 2.625, 2.0], [102794, 'Caverna: The Cave Farmers', 415726, 'English third edition', ['English'], 2017, 8.93701, 12.5197, 4.05512, 0.0], [124361, 'Concordia', 364284, 'English-only third edition', ['English'], 2017, 10.7, 14.6, 2.2, 0.0], [220308, 'Gaia Project', 343321, 'English edition', ['English'], 2017, 11.811, 14.3701, 3.14961, 0.0], [174430, 'Gloomhaven', 268248, 'English Kickstarter minis edition', ['English'], 2017, 11.5, 16.0, 7.5, 19.0], [193738, 'Great Western Trail', 300884, 'English-only first edition', ['English'], 2016, 0.0, 0.0, 0.0, 0.0], [161936, 'Pandemic Legacy: Season 1', 245176, 'English blue edition', ['English'], 2015, 10.625, 14.625, 3.0, 4.9], [3076, 'Puerto Rico', 343715, 'Chinese/English edition', ['Chinese', 'English'], 2011, 10.7, 14.6, 2.2, 0.0], [169786, 'Scythe', 290632, "English collector's edition", ['English'], 2016, 11.811, 14.3701, 3.85827, 0.0], [187645, 'Star Wars: Rebellion', 290665, 'English edition', ['English'], 2016, 11.5748, 11.5748, 5.35433, 6.14649], [120677, 'Terra Mystica', 189525, 'English/French first edition', ['English', 'French'], 2013, 8.8, 12.4, 3.6, 5.5], [167791, 'Terraforming Mars', 256624, 'English first edition, first printing', ['English'], 2016, 11.7, 11.7, 2.8, 0.0], [182028, 'Through the Ages: A New Story of Civilization', 281479, 'English edition', ['English'], 2015, 10.0394, 14.5669, 2.95276, 3.96832], [233078, 'Twilight Imperium (Fourth Edition)', 365218, 'English edition', ['English'], 2017, 11.811, 17.047, 5.276, 10.5161], [12333, 'Twilight Struggle', 243057, "English collector's edition", ['English'], 2016, 13.0, 10.0, 4.0, 8.0], [183394, 'Viticulture Essential Edition', 283706, 'English edition', ['English'], 2015, 8.66142, 10.6299, 4.13386, 4.27697], [115746, 'War of the Ring (Second Edition)', 142738, 'English first edition', ['English'], 2011, 11.0, 16.0, 3.5, 6.56]]
+expansionCollection = [[43539, 'Battlestar Galactica: The Board Game – Pegasus Expansion', 283614, 'English second edition', ['English'], 2013, 11.7, 11.7, 2.8, 0.0, 37111, 'Battlestar Galactica: The Board Game']]
+
+import itertools
+numbers = [1, 2, 3, 4, 5, 6, 7]
+
+def findSum(numbers, target, tolerance):
+    for i in range(1, len(numbers)+1):
+        for comb in itertools.combinations(numbers, i): 
+           if abs(sum(comb) - target) < tolerance:
+               print (comb)
+               return comb
+
+
+findSum(numbers, 13, 0.5)
