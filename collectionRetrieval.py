@@ -136,7 +136,7 @@ for child in collectionRoot:
         collection.append(currentGame)
     elif gameRoot.find('item').attrib['type'] == 'boardgameexpansion':
         for x in gameRoot.find('item').findall('link'):
-            if x.get('type') == 'boardgameexpansion':
+            if x.get('type') == 'boardgameexpansion' and x.get('inbound') == 'true':
                 currentGame.append(int(x.get('id')))
                 currentGame.append(x.get('value'))
                 #add game to collection            
