@@ -26,13 +26,48 @@ def findSum(numbers, target, tolerance):
 
 def calcSum(games, target, tolerance):
     for i in range(1, len(games)+1):
-        for comb in itertools.combinations(games, i): 
+        for comb in itertools.combinations(enumerate(games), i): 
            if abs(sum(comb) - target) < tolerance:
                print (comb)
                return comb
 #findSum(numbers, 13, 0.5)
 
-def insertByWeight(finalShelf, grouping):
+#Used to fill in a cubicle that is partially filled with priority games            
+def PCalcSum(heightSum, games, target, tolerance):
+    target -= heightSum
+    for i in range(1, len(games)+1):
+        for comb in itertools.combinations(enumerate(games), i):
+            combIndex = [x[0] for x in comb]
+            combVal = [x[1] for x in comb]            
+            if target - sum(combVal) < tolerance and target - sum(combVal) > 0:
+                print ("combined sum = ", sum(combVal), "and the target is", target, ". The tolerance is ", tolerance)
+                print ("Combination of values = ", combVal)
+                print ("Index of values = ", combVal)
+                return combIndex
+    return []
+            
+
+def insertByWeight(finalShelf, finalShelfWeight, grouping):
+    #Weight of the games in this grouping
+    groupWeight = 0
+    for game in grouping:
+        groupWeight += game[9]
+    if finalShelf:
+        inserted = False
+        #iterate through each shelf cubicle to organize from highest weight to lowest weight
+        for counter, sortedGroupWeight in enumerate(finalShelfWeight):
+            if groupWeight > sortedGroupWeight:
+                finalShelf.insert(counter, grouping)
+                finalShelfWeight.insert(counter, groupWeight)
+                inserted = True
+        #Checks if values were inserted. If they weren't, it means that this is the smallest weighted value in the listing.
+        if inserted == False:
+            finalShelf.append(grouping)
+            finalShelfWeight.append(groupWeight)
+    else:
+        finalShelf.append(grouping)
+        finalShelfWeight.append(grouping)
+        
     
 
 
@@ -69,26 +104,64 @@ while counter < len(expansionCollectionCopy):
         counter += 1
     
 #We need to do this in case we own expansions WITHOUT the base game
-collectionCopy.append(expansionCollectionCopy)
-print(priorityGames)
+collectionCopy.extend(expansionCollectionCopy)
+#print(priorityGames)
 print(collectionCopy)
 
+collectionHeight = []
+#need to isolate height info in collection array (itertools.combinations won't function in current form)
+for grouping in collectionCopy:
+    collectionHeight.append(grouping[8])
 
 
-
-
-finalShelf = []
-shelfWeight = []
-PGHeightSum = []
-#Check to see if each grouping is smaller than the size of a shelf. Break-up the grouping if it is
+PCollectionHeight = []
+#need to isolate height info in priority collection array (itertools.combinations won't function in current form)
 for grouping in priorityGames:
     heightSum = 0
-    for x in grouping:
-        heightSum += grouping[8]
-    if shelfWidth - heightSum < tolerance and shelfWidth - heightSum > 0
-        
+    for game in grouping:
+        heightSum += game[8]
+    PCollectionHeight.append(heightSum)
         
     
+#This is for any priority games that don't have a combination of other games that fill up to the threshold.
+#These will be filled later at the very end with a larger threshold value, after other games are filled with the current threshold
+UnfilledShelf = []
+#Weight of each incomplete shelf
+UnfilledShelfWeight = []
+#These are the games that will be guaranteed to be on the shelf (Priority games + whichever games fill up the shelf)
+PFinalShelf = []
+#The weight of each shelf cubicle. Will be used to determine where they are placed on the shelf
+PFinalShelfWeight = []
+#The non-priority games that will be on the shelf
+finalShelf = []
+#The weight of each shelf cubicle. Will be used to determine where they are placed on the shelf
+finalShelfWeight = []
+
+#Check to see if each grouping is smaller than the size of a shelf. Break-up the grouping if it is
+print(priorityGames)
+for counter, grouping in enumerate(priorityGames):
+    #If the grouping of games (base + expansion) happens to be a perfect fit for the shelves, we can allocate one entire cubicle for this shelf
+    if shelfWidth - PCollectionHeight[counter] < tolerance and shelfWidth - PCollectionHeight[counter] > 0:
+        insertByWeight(PFinalShelf, PFinalShelfWeight, grouping)
+    #If it's not a perfect fit, try grouping with other priority shelves first
+    print ("Combined height is ", PCollectionHeight[counter])
+    combination = PCalcSum(PCollectionHeight[counter], collectionHeight, shelfWidth, tolerance)
+    #If we find a combination of games that fits the 
+    if combination:
+        for gameNum in combination:
+            grouping.extend(collectionCopy[gameNum])
+        print (combination)
+    else:
+        print ("No additional games will fit on this shelf")
+        insertByWeight(UnfilledShelf, UnfilledShelfWeight, grouping)
+        
+
+
+#for grouping in collectionCopy:
+    
+        
+        
+    #Fill in gaps in priority listing where there wasn't a combination that met the threshold
 
 
         
