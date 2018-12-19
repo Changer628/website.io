@@ -281,11 +281,12 @@ while collectionCopy:
         #def PCalcSum(heightSum, games, target, tolerance):
         combination = PCalcSum(collectionHeight[0], collectionHeight[1:], shelfWidth, tolerance)
         if combination:
+            #THE ISSUE IS RIGHT HERE
             collectionCopy[0] = [collectionCopy[0]]
-            print (collectionCopy[0])
+            print (collectionCopy)
+            print ("COMBINATION = ", combination)
             for gameNum in combination:
                 collectionCopy[0].append(collectionCopy[gameNum])
-            print ("COMBINATION = ", combination)
             print (collectionCopy[0])
             #removes the regular games from the list so that we don't use them in other shelf combinations
             insertByWeight(PFinalShelf, PFinalShelfWeight, collectionCopy[0])
