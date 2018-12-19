@@ -46,12 +46,17 @@ def PCalcSum(heightSum, games, target, tolerance):
                 return combIndex
     return []
 
+#MixedCalcSum(PCollectionHeight[0], PCollectionHeight[1:], collectionHeight, shelfWidth, tolerance)
+
 #Used to fill in a cubicle that is partially filled with priority games, but will pull from both priority lists and regular collection
 def MixedCalcSum(PHeightSum, PGames, CGames, target, tolerance):
     target -= PHeightSum
+    print ("Target = ", target)
     #While we normally prioritize larger size over # of games, we make an exception here. This is because we want more games from the priority group added to the shelf
     for i in reversed(range(0, len(PGames)+1)):
+        print (PGames)
         for PComb in itertools.combinations(enumerate(PGames), i):
+            print ("PComb = ", PComb)
             PCombIndex = [x[0] for x in PComb]
             PCombVal = [x[1] for x in PComb] 
             #We compare every permutation of the priority games with every permutation of regular games
@@ -59,13 +64,18 @@ def MixedCalcSum(PHeightSum, PGames, CGames, target, tolerance):
                 for CComb in itertools.combinations(enumerate(CGames), i):
                     CCombIndex = [x[0] for x in CComb]
                     CCombVal = [x[1] for x in CComb] 
-                    if target - sum(PCombVal) + sum(CCombVal) < tolerance and target - sum(PCombVal + CCombVal) > 0:
+                    if target - (sum(PCombVal) + sum(CCombVal)) < tolerance and target - (sum(PCombVal) + sum(CCombVal)) > 0:
                         print ("combined sum = ", sum(PCombVal) + sum(CCombVal), " where PCombVal is ", sum(PCombVal), " and where CCombVal = ", sum(CCombVal), ". The target is", target, ". The tolerance is ", tolerance)
                         print ("Combination of priority values = ", sum(PCombVal))
                         print ("Combination of regular collection values = ", sum(CCombVal))
                         print ("Index of priority values = ", PCombVal)
                         print ("Index of regular collection values = ", CCombVal)
-                        combIndex = PCombVal.append(CCombVal)
+                        print ("PCombIndex = ", PCombIndex)
+                        print ("CCombIndex = ", CCombIndex)
+                        combIndex = []
+                        combIndex.append(PCombIndex)
+                        combIndex.append(CCombIndex)
+                        print ("combIndex = ", combIndex)
                         return combIndex
     return []
             
@@ -74,6 +84,7 @@ def insertByWeight(finalShelf, finalShelfWeight, grouping):
     #Weight of the games in this grouping
     groupWeight = 0
     for game in grouping:
+        print(game)
         groupWeight += game[9]
     if finalShelf:
         inserted = False
@@ -93,6 +104,10 @@ def insertByWeight(finalShelf, finalShelfWeight, grouping):
         finalShelf.append(grouping)
         finalShelfWeight.append(groupWeight)
         
+def removeGames(collectionCopy, index):
+    #Index is sorted from smallest to largest, so this allows us to remove games without affecting the index position of them
+    for number in reversed (index):
+        del collectionCopy[number]
     
 
 
@@ -166,45 +181,129 @@ finalShelf = []
 finalShelfWeight = []
 
 #Check to see if each grouping is smaller than the size of a shelf. Break-up the grouping if it is
-print(priorityGames)
 for counter, grouping in enumerate(priorityGames):
-    #If the grouping of games (base + expansion) happens to be a perfect fit for the shelves, we can allocate one entire cubicle for this shelf
-    if shelfWidth - PCollectionHeight[counter] < tolerance and shelfWidth - PCollectionHeight[counter] > 0:
-        insertByWeight(PFinalShelf, PFinalShelfWeight, grouping)
-    #If it's not a perfect fit, try grouping with other priority shelves first
-    print ("Combined height is ", PCollectionHeight[counter])
-    combination = PCalcSum(PCollectionHeight[counter], PCollectionHeight[counter+1:], shelfWidth, tolerance)
-    #If we find a combination of games that fits the shelf
-    if combination:
-        for gameNum in combination:
-            grouping.extend(PriorityGames[gameNum])
-        print (combination)
-    else:
-        #Find a combination through both priority + regular games, with an emphasis on priority games first
-        combination = MixedCalcSum(PCollectionHeight[counter], PCollectionHeight[counter+1:], collectionHeight, shelfWidth, tolerance)
-        #we're ordering the conditionals in this manner because in the majority of cases it will be a length of size 2. 
-        if (len(combination) == 2):
-            for gameNum in combination[0]:
-                grouping.extend(PriorityGames[gameNum])
-            collectionNum = []
-            for gameNum in combination[1]:
-                collectionNum.extend(collectionCopy[gameNum])
-            grouping.append(collectionCopy[gameNum])
-            print("A combination of both priority games and regular games were added to the current priority games to fill the shelf")
-        #if there is only one list, it means that there were 0 games in the priority game list that fills in the gap
-        elif (len(combination) == 1):
-            collectionNum = []
-            for gameNum in combination[0]:
-                collectionNum.extend(collectionCopy[gameNum])
-            grouping.append(collectionCopy[gameNum])
-            print("Only regular games were added to the current priority games to fill the shelf")
-        elif not combination:
-            print ("No additional games will fit on this shelf")
-            insertByWeight(PUnfilledShelf, PUnfilledShelfWeight, grouping)
-        #MixedCalcSum(PHeightSum, PGames, CGames, target, tolerance):
-
-
+    #Check if the grouping of priority games is larger than the shelf width
+    if PCollectionHeight[counter] > shelfWidth:
+        #Find the amount of width we need to remove for the game to fit
+        extraWidth = PCollectionHeight[counter] - shelfWidth
+        #These three variables make it easier to delete the listing without needing to iterate through the list again
+        smallestExtra = [grouping[0]]
+        smallestExtraIndex = 0
+        for i in range(1, len(grouping)+1):
+                for games in itertools.combinations(enumerate(grouping), i):
+                    height = [el[1][8] for el in games]
+                    #check to see if this game(s) is the smallest batch of games that is also larger than the threshold we need to remove
+                    if height < smallestExtra[8] and height > shelfWidth:
+                        smallestExtra = [el[1] for el in games]
+                        smallestExtraIndex = [el[0] for el in games]
+                        for index in smallestExtraIndex:
+                            del priorityGames[counter][index]
+                        for index in smallestExtra:
+                            PCollectionHeight[counter] -= index[8]
+                        priorityGames.insert(counter + 1, smallestExtra)
+                        PCollectionHeight.insert(counter + 1, sum(el[8] for el in smallestExtra))
+                            
+                    
+        #for num, game in enumerate(grouping):
+         #   if game[8] < smallestExtra:
+          #      smallestExtra = game
+           #     smallestExtraIndex = num
+        #del priorityGames[counter][smallestExtraIndex]
+        #PCollectionHeight[counter] -= smallestExtra[8]
+        #priorityGames.insert(smallestExtraIndex + 1, smallestExtra)
+        #PCollectionHeight.insert(counter + 1, smallestExtra[8])
         
+        
+print(priorityGames)
+
+while priorityGames:
+    #If the grouping of games (base + expansion) happens to be a perfect fit for the shelves, we can allocate one entire cubicle for this shelf
+    if shelfWidth - PCollectionHeight[0] < tolerance and shelfWidth - PCollectionHeight[0] > 0:
+        #print ("shelfWidth = ", shelfWidth, ", Priority Collection Height = ", PCollectionHeight[0], "tolerance = ", tolerance) 
+        insertByWeight(PFinalShelf, PFinalShelfWeight, priorityGames[0])
+        del PCollectionHeight[0]
+        del priorityGames[0]
+    else:
+        #If it's not a perfect fit, try grouping with other priority shelves first
+        print ("Combined height is ", PCollectionHeight[0])
+        combination = []
+        #There needs to be more than one grouping to try this
+        if len(priorityGames) > 1:
+            combination = PCalcSum(PCollectionHeight[0], PCollectionHeight[1:], shelfWidth, tolerance)
+            print ("Combination = ", combination)
+        #If we find a combination of games that fits the shelf
+        if combination:
+            for gameNum in combination:
+                priorityGames[0].extend(priorityGames[gameNum])
+            print (combination)
+            #removes the priority games from the list so that we don't use them in other shelf combinations
+            removeGames(priorityGames, combination)
+            insertByWeight(PFinalShelf, PFinalShelfWeight, priorityGames[0])
+            del PCollectionHeight[0]
+            del priorityGames[0]    
+        else:
+            #Find a combination through both priority + regular games, with an emphasis on priority games first
+            combination = MixedCalcSum(PCollectionHeight[0], PCollectionHeight[1:], collectionHeight, shelfWidth, tolerance)
+            #we're ordering the conditionals in this manner because in the majority of cases it will be a length of size 2. 
+            if (len(combination) == 2):
+                for gameNum in combination[0]:
+                    priorityGames[0].extend(priorityGames[gameNum])
+                for gameNum in combination[1]:
+                    priorityGames[0].append(collectionCopy[gameNum])
+                insertByWeight(PFinalShelf, PFinalShelfWeight, priorityGames[0])
+                removeGames(priorityGames, combination[0])
+                removeGames(collectionCopy, combination[1])
+                print("A combination of both priority games and regular games were added to the current priority games to fill the shelf")
+            #if there is only one list, it means that there were 0 games in the priority game list that fills in the gap
+            elif (len(combination) == 1):
+                for gameNum in combination[0]:
+                    priorityGames.extend(collectionCopy[gameNum])
+                insertByWeight(PFinalShelf, PFinalShelfWeight, priorityGames[0])
+                removeGames(collectionCopy, combination[0])
+                print("Only regular games were added to the current priority games to fill the shelf")
+            elif not combination:
+                print ("No additional games will fit on this shelf")
+                insertByWeight(PUnfilledShelf, PUnfilledShelfWeight, priorityGames[0])
+            #MixedCalcSum(PHeightSum, PGames, CGames, target, tolerance):
+            del priorityGames[0]
+            del PCollectionHeight[0]
+
+
+
+while collectionCopy:
+    #If the single game happens to be a perfect fit for the shelves, we can allocate one entire cubicle for this one game
+    if shelfWidth - collectionHeight[0] < tolerance and shelfWidth - collectionHeight[0] > 0:
+        insertByWeight(PFinalShelf, PFinalShelfWeight, collectionCopy[0])
+        del collectionHeight[0]
+        del collectionCopy[0]
+    else:
+        #Find a combination through remaining games
+        #def PCalcSum(heightSum, games, target, tolerance):
+        combination = PCalcSum(collectionHeight[0], collectionHeight[1:], shelfWidth, tolerance)
+        if combination:
+            collectionCopy[0] = [collectionCopy[0]]
+            print (collectionCopy[0])
+            for gameNum in combination:
+                collectionCopy[0].append(collectionCopy[gameNum])
+            print ("COMBINATION = ", combination)
+            print (collectionCopy[0])
+            #removes the regular games from the list so that we don't use them in other shelf combinations
+            insertByWeight(PFinalShelf, PFinalShelfWeight, collectionCopy[0])
+            removeGames(collectionCopy, combination)
+        else:
+            print ("No additional games will fit on this shelf")
+            insertByWeight(UnfilledShelf, UnfilledShelfWeight, collectionCopy[0])
+            #MixedCalcSum(PHeightSum, PGames, CGames, target, tolerance):
+        del collectionHeight[0]
+        del collectionCopy[0]
+            
+print("----------------------------Complete----------------------------")
+print("Priority Unfilled Shelf = ", PUnfilledShelf)
+print("Regular Unfilled Shelf = ", UnfilledShelf)
+print("Priority Final Shelf = ", PFinalShelf)
+print("Regular Final Shelf = ", finalShelf)
+
+
         ########This set of code is reserved for extreme cases where no games will allow this set of games to reach the threshold. In this case, the games are just added to a shelf as is.
         ########The intent is to fill it using a greater tolerance value later
         
