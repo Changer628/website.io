@@ -29,18 +29,21 @@
           </nav>
         </div>
       </header>
-
-      <main role="main" class="inner cover">
-        <h1 class="cover-heading">Basic Sort!</h1>
-        <form method="POST" action=/shelfsort>
-          <label for="usr" class="lead">Please Enter Your BGG Username below:</label>
-          <div class="input-group" id="inputTag">
-            <input type="text" class="form-control width100" id="usr" name="username">
-            <button type="submit" class="btn lead btn-secondary" id="submit">Submit</button>
-          </div>
-        </form>
-      </main>
-	  <div class="row">
+	  
+	  <div class="userInputs">
+		  <main role="main" class="inner cover">
+			<h1 class="cover-heading">Basic Sort!</h1>
+			<form method="POST" action=/shelfsort>
+			  <label for="usr" class="lead">Please Enter Your BGG Username below:</label>
+			  <div class="input-group" id="inputTag">
+				<input type="text" class="form-control width100" id="usr" name="username">
+				<button type="submit" class="btn lead btn-secondary" id="submit">Submit</button>
+			  </div>
+			</form>
+		  </main>
+	  </div>
+	  
+	  <div class="games">
 		{% for grouping in games %}
 			{% set outer_loop = loop %}
 			{% if outer_loop.index % 3 == 1 %}
@@ -51,7 +54,7 @@
 					{{ game[0] }}
 					</div>
 				{% elif loop.index == 1 %}
-					<div class="col-xl-4">
+					<div class="col-xl-4 grouping">
 						{{ game[0] }}<br />
 				{% else %}
 					{{ game[0] }}<br />

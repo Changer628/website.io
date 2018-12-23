@@ -97,10 +97,29 @@ body {
   font-weight: 700;
 }
 
-.input-group>.custom-file, .input-group>.custom-select, .input-group>.form-control {
+.input-group {
+	justify-content: center;
+}
+
+#usr {
 	flex: none;
-	display: inline-block
+	display: inline-block;
 	width: 75%;
+}
+
+.userInputs{
+	padding: 0 0 5rem 0;
+}
+
+.grouping{
+	border: solid;
+	border-radius: 5px;
+}
+
+.col-xl-4{
+	margin-left: auto;
+    margin-right: auto;
+	width: 90%;
 }
 
 .submit {
