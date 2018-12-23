@@ -36,7 +36,7 @@ for child in collectionRoot:
             if link.get('type') == 'language':
                 language.append(link.get('value'))
         currentGame.append(language)
-            
+        
         #add year published
         if version.find('yearpublished').attrib['value']:
             currentGame.append(int(version.find('yearpublished').attrib['value']))
@@ -52,6 +52,9 @@ for child in collectionRoot:
         #add weight
         if version.find('weight').attrib['value']:
             currentGame.append(float(version.find('weight').attrib['value']))
+        #add thumbnail
+        if version.find('thumbnail').text:
+            currentGame.append(version.find('thumbnail').text)
     else:
         #get latest english version
         
@@ -85,6 +88,9 @@ for child in collectionRoot:
         #add weight
         if gameVersion.find('item').find('weight').attrib['value']:
             missingInfo.append(float(gameVersion.find('item').find('weight').attrib['value']))
+        #add thumbnail
+        if gameRoot.find('item').find('thumbnail').text:
+            missingInfo.append(gameRoot.find('item').find('thumbnail').text)          
             
         if 'English' in missingInfo[2] == True:
             currentGame.extend(missingInfo)
@@ -125,6 +131,9 @@ for child in collectionRoot:
                             #add weight
                             if x.find('weight').attrib['value']:
                                 englishMissingInfo.append(float(x.find('weight').attrib['value']))
+                            #add thumbnail
+                            if gameRoot.find('item').find('thumbnail').text:
+                                englishMissingInfo.append(gameRoot.find('item').find('thumbnail').text)   
                             found = True
                             break
             if found == True:
