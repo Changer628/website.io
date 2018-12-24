@@ -51,7 +51,9 @@
 			{% endif %}
 			{% for game in grouping %}	
 				{% if loop.index == grouping|length %}
-					{{ game[0] }}
+					<p><span>{{ game[0] }}</span>
+					<img src={{ game[1] }}/> </p>
+					{{ game[1] }}
 					</div>
 				{% elif loop.index == 1 %}
 					<div class="col-xl-4 grouping">
