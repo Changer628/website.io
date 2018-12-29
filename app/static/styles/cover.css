@@ -122,12 +122,14 @@ body {
 }
 
 img{
-    display: none
+	position: absolute;
+    display: none;
+	z-index: 1;
 }
 
-span:hover + img{
+/*span:hover + img{
     display: block;
-}
+}*/
 
 .col-xl-4{
 	margin-left: auto;

@@ -51,15 +51,24 @@
 			{% endif %}
 			{% for game in grouping %}	
 				{% if loop.index == grouping|length %}
-					<p><span>{{ game[0] }}</span>
-					<img src={{ game[1] }}/> </p>
-					{{ game[1] }}
+						<div>
+							<div>
+								<span>{{ game[0] }}</span>
+								<img src={{ game[1] }}>
+							</div>
+						</div>						
 					</div>
 				{% elif loop.index == 1 %}
 					<div class="col-xl-4 grouping">
-						{{ game[0] }}<br />
+						<div>
+							<span>{{ game[0] }}</span>
+							<img src={{ game[1] }}><br />
+						</div>
 				{% else %}
-					{{ game[0] }}<br />
+					<div>
+						<span>{{ game[0] }}</span>
+						<img src={{ game[1] }}><br />
+					</div>
 				{% endif %}
 			{% endfor %}
 			{% if outer_loop.index % 3 == 0 or outer_loop.index == games|length %}
@@ -67,13 +76,20 @@
 			{% endif %}
 		{% endfor %}
 	  </div>
+	  <div id="allImages">
+		{% for grouping in games %}
+			{% for game in grouping %}	
+				<img id={{ game[0] }} src={{ game[1] }}>
+			{% endfor %}
+		{% endfor %}
+	  </div>
       <footer class="mastfoot mt-auto">
       </footer>
     </div>
-	
+
 	
 
-
+	
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -81,5 +97,34 @@
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
     <script src="../../assets/js/vendor/popper.min.js"></script>
     <script src="../../dist/js/bootstrap.min.js"></script>
+	
+	<script type=text/javascript>
+		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+	</script>
+	
+	<script>
+		$(document).ready(function(){
+			
+			$("span").hover(function(){
+				//$gameName = $(this).text();
+				
+				//$game = $( "#" + $gameName );
+				//$game.stop(1,1).fadeIn(400);
+				$game = $(this).siblings('img');
+				
+				$game.show();
+				$game.offset({
+					top: e.pageY - $game.outerHeight(),
+					left: e.pageX - ($game.outerWidth()/2)
+				}); 
+			},function(){
+				//alert($game.offset.left + ", " + $game.offset.top + " )" );
+				$game.hide();
+				//$game.fadeOut(400);
+			});
+			
+		});
+	</script>
+	
   </body>
 </html>
